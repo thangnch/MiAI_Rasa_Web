@@ -1,0 +1,56 @@
+<html>
+<head>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+</head>
+<body>
+CHATBOT DEMO <br>
+<textarea id="chat_content" style="width: 300px;
+  height: 150px;"></textarea>
+<br>
+<input type="text" id="user_message">
+<br>
+<button id="btn_send">Send</button>
+<script>
+    function addToTextArea($ta, text) {
+            var val = $ta.val();
+            if (val) {
+                $ta.val(val + '\n' + text);
+            } else {
+                $ta.val(text);
+            }
+            $ta.scrollTop($ta[0].scrollHeight);
+        }
+
+    // Khi ng dung go enter o o message thi goi lenh sendchat
+    $('#user_message').keypress(function (event) {
+       var keycode =  (event.keyCode ? event.keyCode : event.which);
+       if (keycode == '13')
+       {
+            sendchat();
+       }
+    });
+
+    function sendchat() {
+        // Lay gia tri cua o user_message vao bien
+        var user_message = $('#user_message').val();
+        $('#user_message').val('');
+
+        // Them [BẠN]: + Nội dung chat vào ô textarea
+        addToTextArea($('#chat_content'), "[BẠN]:" + user_message);
+
+        // Send vao rasa http end point
+        $.ajax({
+            type: 'POST',
+            url: 'http://127.0.0.1:5005/webhooks/rest/webhook',
+            data: '{"sender":"test","message":"' + user_message + '"}',
+            success: function (data) {
+                addToTextArea($('#chat_content'), "[BOT]:" + data[0].text);
+            },
+
+        });
+    }
+
+
+</script>
+</body>
+</html>
